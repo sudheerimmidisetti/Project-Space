@@ -3,6 +3,7 @@ import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 import LoginForm from './LoginForm';
 import SignUpForm from './SignUpForm';
+import DottedBackground from './DottedBackground';
 
 const AuthContainer = () => {
     const [isLogin, setIsLogin] = useState(true);
@@ -33,12 +34,14 @@ const AuthContainer = () => {
 
     return (
         <div className="min-h-screen bg-brand-dark flex items-center justify-center p-4 overflow-hidden relative" ref={containerRef}>
+            <DottedBackground />
+
             {/* Animated Background Elements */}
-            <div className="animated-bg absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-brand-light/20 rounded-full blur-[100px] pointer-events-none" />
-            <div className="animated-bg absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-brand-muted/20 rounded-full blur-[120px] pointer-events-none" />
+            <div className="animated-bg absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-brand-light/20 rounded-full blur-[100px] pointer-events-none z-0" />
+            <div className="animated-bg absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-brand-muted/20 rounded-full blur-[120px] pointer-events-none z-0" />
 
             {/* Main Container */}
-            <div className="relative w-full max-w-md h-[650px]" style={{ perspective: '1000px' }}>
+            <div className="relative w-full max-w-md h-[650px] z-10" style={{ perspective: '1000px' }}>
                 {/* Flip Container */}
                 <div
                     className="w-full h-full relative"
@@ -50,12 +53,12 @@ const AuthContainer = () => {
                 >
                     {/* Front (Login) */}
                     <div className="absolute inset-0 w-full h-full p-2" style={{ backfaceVisibility: 'hidden' }}>
-                        <LoginForm onToggle={toggleForm} />
+                        <LoginForm onToggle={toggleForm} isActive={isLogin} />
                     </div>
 
                     {/* Back (Sign Up) */}
                     <div className="absolute inset-0 w-full h-full p-2" style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}>
-                        <SignUpForm onToggle={toggleForm} />
+                        <SignUpForm onToggle={toggleForm} isActive={!isLogin} />
                     </div>
 
                 </div>
