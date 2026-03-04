@@ -1,6 +1,28 @@
+const isBrowser = typeof window !== "undefined";
+const isLocalFrontend =
+  isBrowser && ["localhost", "127.0.0.1"].includes(window.location.hostname);
+
+const configuredApiUrl = (import.meta.env.VITE_API_URL || "").trim();
+
 const API_BASE_URL = (
-  import.meta.env.VITE_API_URL || "http://localhost:5000"
+  configuredApiUrl || (isLocalFrontend ? "http://localhost:5000" : "")
 ).replace(/\/$/, "");
+
+const getConfigError = () => {
+  if (!API_BASE_URL) {
+    return "API base URL is not configured. Set VITE_API_URL in frontend .env (local) or .env.production (deployed).";
+  }
+
+  const pointsToLocalhost = /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/i.test(
+    API_BASE_URL,
+  );
+
+  if (!isLocalFrontend && pointsToLocalhost) {
+    return `Invalid API URL for deployed frontend: ${API_BASE_URL}. Localhost only works on local dev. Set VITE_API_URL to a public HTTPS backend URL and redeploy.`;
+  }
+
+  return "";
+};
 
 const buildApiUrl = (path) => {
   const normalizedPath = path.startsWith("/") ? path : `/${path}`;
@@ -37,6 +59,11 @@ const getResponseMessage = async (response) => {
 };
 
 export const apiFetch = async (path, options = {}) => {
+  const configError = getConfigError();
+  if (configError) {
+    throw new Error(configError);
+  }
+
   const headers = {
     ...(options.body ? { "Content-Type": "application/json" } : {}),
     ...(options.headers || {}),
@@ -51,7 +78,7 @@ export const apiFetch = async (path, options = {}) => {
     });
   } catch (error) {
     throw new Error(
-      `Unable to reach backend at ${API_BASE_URL}. Start backend server and verify frontend .env`,
+      `Unable to reach backend at ${API_BASE_URL}. ${error?.message || "Check that backend is running and URL is correct."}`,
     );
   }
 
