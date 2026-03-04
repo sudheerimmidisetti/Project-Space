@@ -109,7 +109,7 @@ const LoginForm = ({ onToggle, isActive }) => {
                         <input type="checkbox" className="mr-2 rounded border-brand-muted/30 bg-brand-dark/30 text-brand-light focus:ring-brand-light/20" />
                         Remember me
                     </label>
-                    <a href="#" className="font-medium text-brand-light hover:text-white transition-colors">Forgot password?</a>
+                    <Link to="/forgot-password" className="font-medium text-brand-light hover:text-white transition-colors">Forgot password?</Link>
                 </div>
 
                 <button
