@@ -1,10 +1,68 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { User, Mail, Lock, UserPlus, Chrome } from 'lucide-react';
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 
 const SignUpForm = ({ onToggle, isActive }) => {
     const formRef = useRef(null);
+    const [formData, setFormData] = useState({
+        fullName: '',
+        email: '',
+        password: '',
+        confirmPassword: ''
+    });
+    const [error, setError] = useState('');
+    const [success, setSuccess] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
+
+    const handleChange = (e) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
+        setError('');
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setError('');
+        setSuccess('');
+
+        if (formData.password !== formData.confirmPassword) {
+            return setError('Passwords do not match');
+        }
+
+        try {
+            setIsLoading(true);
+            const response = await fetch('http://localhost:5000/api/auth/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    fullName: formData.fullName,
+                    email: formData.email,
+                    password: formData.password
+                }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message || 'Something went wrong');
+            }
+
+            setSuccess('Registration successful! Please sign in.');
+            setFormData({ fullName: '', email: '', password: '', confirmPassword: '' });
+
+            // Optionally auto-toggle to login after a delay
+            setTimeout(() => {
+                onToggle();
+            }, 2000);
+
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     useGSAP(() => {
         if (isActive) {
@@ -24,7 +82,10 @@ const SignUpForm = ({ onToggle, isActive }) => {
                 <p className="text-brand-light">Join us to experience the best.</p>
             </div>
 
-            <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
+            {error && <div className="mb-4 p-3 bg-red-500/20 border border-red-500/50 rounded-xl text-red-200 text-sm signup-element">{error}</div>}
+            {success && <div className="mb-4 p-3 bg-green-500/20 border border-green-500/50 rounded-xl text-green-200 text-sm signup-element">{success}</div>}
+
+            <form className="space-y-4" onSubmit={handleSubmit}>
                 <div className="space-y-4">
                     <div className="relative group signup-element">
                         <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
@@ -32,8 +93,12 @@ const SignUpForm = ({ onToggle, isActive }) => {
                         </div>
                         <input
                             type="text"
+                            name="fullName"
+                            value={formData.fullName}
+                            onChange={handleChange}
                             className="w-full bg-brand-dark/30 border border-brand-muted/30 focus:border-brand-light/50 rounded-xl py-2.5 pl-12 pr-4 text-white placeholder-brand-light/50 outline-none transition-all shadow-inner backdrop-blur-sm focus:ring-2 focus:ring-brand-light/20"
                             placeholder="Full Name"
+                            required
                         />
                     </div>
 
@@ -43,8 +108,12 @@ const SignUpForm = ({ onToggle, isActive }) => {
                         </div>
                         <input
                             type="email"
+                            name="email"
+                            value={formData.email}
+                            onChange={handleChange}
                             className="w-full bg-brand-dark/30 border border-brand-muted/30 focus:border-brand-light/50 rounded-xl py-2.5 pl-12 pr-4 text-white placeholder-brand-light/50 outline-none transition-all shadow-inner backdrop-blur-sm focus:ring-2 focus:ring-brand-light/20"
                             placeholder="Email address"
+                            required
                         />
                     </div>
 
@@ -54,8 +123,12 @@ const SignUpForm = ({ onToggle, isActive }) => {
                         </div>
                         <input
                             type="password"
+                            name="password"
+                            value={formData.password}
+                            onChange={handleChange}
                             className="w-full bg-brand-dark/30 border border-brand-muted/30 focus:border-brand-light/50 rounded-xl py-2.5 pl-12 pr-4 text-white placeholder-brand-light/50 outline-none transition-all shadow-inner backdrop-blur-sm focus:ring-2 focus:ring-brand-light/20"
                             placeholder="Password"
+                            required
                         />
                     </div>
 
@@ -65,15 +138,22 @@ const SignUpForm = ({ onToggle, isActive }) => {
                         </div>
                         <input
                             type="password"
+                            name="confirmPassword"
+                            value={formData.confirmPassword}
+                            onChange={handleChange}
                             className="w-full bg-brand-dark/30 border border-brand-muted/30 focus:border-brand-light/50 rounded-xl py-2.5 pl-12 pr-4 text-white placeholder-brand-light/50 outline-none transition-all shadow-inner backdrop-blur-sm focus:ring-2 focus:ring-brand-light/20"
                             placeholder="Confirm Password"
+                            required
                         />
                     </div>
                 </div>
 
-                <button className="w-full mt-2 bg-gradient-to-r from-brand-muted to-brand-light hover:opacity-90 text-brand-dark font-semibold py-3 px-4 rounded-xl flex items-center justify-center gap-2 transform transition-all hover:scale-[1.02] active:scale-[0.98] shadow-[0_0_20px_rgba(148,180,193,0.3)] signup-element">
+                <button
+                    disabled={isLoading}
+                    className="w-full mt-2 bg-gradient-to-r from-brand-muted to-brand-light hover:opacity-90 text-brand-dark font-semibold py-3 px-4 rounded-xl flex items-center justify-center gap-2 transform transition-all hover:scale-[1.02] active:scale-[0.98] shadow-[0_0_20px_rgba(148,180,193,0.3)] signup-element disabled:opacity-70 disabled:cursor-not-allowed cursor-pointer"
+                >
                     <UserPlus className="h-5 w-5" />
-                    Create Account
+                    {isLoading ? 'Creating Account...' : 'Create Account'}
                 </button>
 
                 <div className="relative flex items-center justify-center my-4 signup-element">

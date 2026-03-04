@@ -1,10 +1,54 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { Mail, Lock, LogIn, Chrome } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 
 const LoginForm = ({ onToggle, isActive }) => {
     const formRef = useRef(null);
+    const navigate = useNavigate();
+    const [formData, setFormData] = useState({ email: '', password: '' });
+    const [error, setError] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
+
+    const handleChange = (e) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
+        setError('');
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setError('');
+
+        try {
+            setIsLoading(true);
+            const response = await fetch('http://localhost:5000/api/auth/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message || 'Login failed');
+            }
+
+            // Store token in localStorage
+            localStorage.setItem('token', data.token);
+            localStorage.setItem('user', JSON.stringify(data.user));
+
+            // Redirect to home page
+            navigate('/home');
+
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     useGSAP(() => {
         if (isActive) {
@@ -24,7 +68,9 @@ const LoginForm = ({ onToggle, isActive }) => {
                 <p className="text-brand-light">Please enter your details to sign in.</p>
             </div>
 
-            <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
+            {error && <div className="mb-4 p-3 bg-red-500/20 border border-red-500/50 rounded-xl text-red-200 text-sm login-element">{error}</div>}
+
+            <form className="space-y-6" onSubmit={handleSubmit}>
                 <div className="space-y-4">
                     <div className="relative group login-element">
                         <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
@@ -32,8 +78,12 @@ const LoginForm = ({ onToggle, isActive }) => {
                         </div>
                         <input
                             type="email"
+                            name="email"
+                            value={formData.email}
+                            onChange={handleChange}
                             className="w-full bg-brand-dark/30 border border-brand-muted/30 focus:border-brand-light/50 rounded-xl py-3 pl-12 pr-4 text-white placeholder-brand-light/50 outline-none transition-all shadow-inner backdrop-blur-sm focus:ring-2 focus:ring-brand-light/20"
                             placeholder="Email address"
+                            required
                         />
                     </div>
 
@@ -43,8 +93,12 @@ const LoginForm = ({ onToggle, isActive }) => {
                         </div>
                         <input
                             type="password"
+                            name="password"
+                            value={formData.password}
+                            onChange={handleChange}
                             className="w-full bg-brand-dark/30 border border-brand-muted/30 focus:border-brand-light/50 rounded-xl py-3 pl-12 pr-4 text-white placeholder-brand-light/50 outline-none transition-all shadow-inner backdrop-blur-sm focus:ring-2 focus:ring-brand-light/20"
                             placeholder="Password"
+                            required
                         />
                     </div>
                 </div>
@@ -57,9 +111,12 @@ const LoginForm = ({ onToggle, isActive }) => {
                     <a href="#" className="font-medium text-brand-light hover:text-white transition-colors">Forgot password?</a>
                 </div>
 
-                <button className="w-full bg-gradient-to-r from-brand-muted to-brand-light hover:opacity-90 text-brand-dark font-semibold py-3 px-4 rounded-xl flex items-center justify-center gap-2 transform transition-all hover:scale-[1.02] active:scale-[0.98] shadow-[0_0_20px_rgba(148,180,193,0.3)] login-element interactive-btn">
+                <button
+                    disabled={isLoading}
+                    className="w-full bg-gradient-to-r from-brand-muted to-brand-light hover:opacity-90 text-brand-dark font-semibold py-3 px-4 rounded-xl flex items-center justify-center gap-2 transform transition-all hover:scale-[1.02] active:scale-[0.98] shadow-[0_0_20px_rgba(148,180,193,0.3)] login-element interactive-btn disabled:opacity-70 disabled:cursor-not-allowed cursor-pointer"
+                >
                     <LogIn className="h-5 w-5" />
-                    Sign In
+                    {isLoading ? 'Signing In...' : 'Sign In'}
                 </button>
 
                 <div className="relative flex items-center justify-center my-6 login-element">
