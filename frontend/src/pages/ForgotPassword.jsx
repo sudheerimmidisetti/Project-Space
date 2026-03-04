@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Mail, ArrowLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import DottedBackground from '../components/DottedBackground'; // Assuming DottedBackground is in components
+import { apiFetch } from '../utils/api';
 
 const ForgotPassword = () => {
     const [email, setEmail] = useState('');
@@ -16,19 +17,10 @@ const ForgotPassword = () => {
         setError('');
 
         try {
-            const response = await fetch('http://localhost:5000/api/auth/forgotpassword', {
+            await apiFetch('/api/auth/forgotpassword', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
                 body: JSON.stringify({ email })
             });
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(data.message || 'Something went wrong');
-            }
 
             setMessage('Password reset email sent. Please check your inbox.');
         } catch (err) {

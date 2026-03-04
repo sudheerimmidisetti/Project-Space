@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Key, Eye, EyeOff, Lock } from 'lucide-react';
 import { useParams, useNavigate } from 'react-router-dom';
 import DottedBackground from '../components/DottedBackground';
+import { apiFetch } from '../utils/api';
 
 const ResetPassword = () => {
     const { token } = useParams();
@@ -27,19 +28,10 @@ const ResetPassword = () => {
         setError('');
 
         try {
-            const response = await fetch(`http://localhost:5000/api/auth/resetpassword/${token}`, {
+            await apiFetch(`/api/auth/resetpassword/${token}`, {
                 method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
                 body: JSON.stringify({ password })
             });
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(data.message || 'Something went wrong');
-            }
 
             setMessage('Password reset successful. Redirecting to login...');
 

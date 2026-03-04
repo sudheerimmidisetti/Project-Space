@@ -2,6 +2,7 @@ import React, { useRef, useState } from 'react';
 import { User, Mail, Lock, UserPlus, Chrome } from 'lucide-react';
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
+import { apiFetch } from '../utils/api';
 
 const SignUpForm = ({ onToggle, isActive }) => {
     const formRef = useRef(null);
@@ -31,24 +32,14 @@ const SignUpForm = ({ onToggle, isActive }) => {
 
         try {
             setIsLoading(true);
-            const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-            const response = await fetch(`${apiUrl}/api/auth/register`, {
+            const data = await apiFetch('/api/auth/register', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
                 body: JSON.stringify({
                     fullName: formData.fullName,
                     email: formData.email,
                     password: formData.password
                 }),
             });
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(data.message || 'Something went wrong');
-            }
 
             setSuccess('Registration successful! Please sign in.');
             setFormData({ fullName: '', email: '', password: '', confirmPassword: '' });

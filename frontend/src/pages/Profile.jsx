@@ -2,6 +2,7 @@ import React, { useRef, useState, useEffect } from 'react';
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 import { User, Mail, Calendar, Edit3, Settings, Shield, Check, X, Lock, Key } from 'lucide-react';
+import { apiFetch } from '../utils/api';
 
 const Profile = () => {
     const containerRef = useRef(null);
@@ -41,21 +42,13 @@ const Profile = () => {
             const token = localStorage.getItem('token');
             const updatedValue = editForm[field];
 
-            const response = await fetch('http://localhost:5000/api/auth/profile', {
+            const data = await apiFetch('/api/auth/profile', {
                 method: 'PUT',
                 headers: {
-                    'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
                 },
                 body: JSON.stringify({ [field]: updatedValue })
             });
-
-            if (!response.ok) {
-                const data = await response.json();
-                throw new Error(data.message || 'Failed to update profile');
-            }
-
-            const data = await response.json();
 
             // Update local state and storage
             setUser(data.user);
@@ -88,10 +81,9 @@ const Profile = () => {
 
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch('http://localhost:5000/api/auth/password', {
+            await apiFetch('/api/auth/password', {
                 method: 'PUT',
                 headers: {
-                    'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
                 },
                 body: JSON.stringify({
@@ -99,11 +91,6 @@ const Profile = () => {
                     newPassword: securityForm.newPassword
                 })
             });
-
-            if (!response.ok) {
-                const data = await response.json();
-                throw new Error(data.message || 'Failed to update password');
-            }
 
             alert("Password updated successfully!");
             setSecurityForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
@@ -119,21 +106,14 @@ const Profile = () => {
             const token = localStorage.getItem('token');
             const newStatus = !twoFactorEnabled;
 
-            const response = await fetch('http://localhost:5000/api/auth/profile', {
+            const data = await apiFetch('/api/auth/profile', {
                 method: 'PUT',
                 headers: {
-                    'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
                 },
                 body: JSON.stringify({ twoFactorEnabled: newStatus })
             });
 
-            if (!response.ok) {
-                const data = await response.json();
-                throw new Error(data.message || 'Failed to update 2FA status');
-            }
-
-            const data = await response.json();
             setUser(data.user);
             localStorage.setItem('user', JSON.stringify(data.user));
             setTwoFactorEnabled(data.user.twoFactorEnabled);

@@ -4,6 +4,7 @@ import { Mail, Lock, LogIn, Chrome } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
+import { apiFetch } from '../utils/api';
 
 const LoginForm = ({ onToggle, isActive }) => {
     const formRef = useRef(null);
@@ -23,20 +24,10 @@ const LoginForm = ({ onToggle, isActive }) => {
 
         try {
             setIsLoading(true);
-            const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-            const response = await fetch(`${apiUrl}/api/auth/login`, {
+            const data = await apiFetch('/api/auth/login', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
                 body: JSON.stringify(formData),
             });
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(data.message || 'Login failed');
-            }
 
             // Store token in localStorage
             localStorage.setItem('token', data.token);
