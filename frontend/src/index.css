@@ -12,6 +12,6 @@
 /* Custom utilities for glassmorphism */
 @layer utilities {
   .glass {
-    @apply bg-white/10 backdrop-blur-lg border border-white/20 shadow-[0_8px_32px_0_rgba(33,52,72,0.1)];
+    @apply bg-white/10 backdrop-blur-lg border border-white/20 shadow-[0_8px_32px_0_rgba(18,0,47,0.1)];
   }
 }

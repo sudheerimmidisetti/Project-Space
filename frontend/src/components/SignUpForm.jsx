@@ -142,7 +142,7 @@ const SignUpForm = ({ onToggle, isActive }) => {
 
                 <button
                     disabled={isLoading}
-                    className="w-full mt-2 bg-gradient-to-r from-brand-muted to-brand-light hover:opacity-90 text-brand-dark font-semibold py-3 px-4 rounded-xl flex items-center justify-center gap-2 transform transition-all hover:scale-[1.02] active:scale-[0.98] shadow-[0_0_20px_rgba(148,180,193,0.3)] signup-element disabled:opacity-70 disabled:cursor-not-allowed cursor-pointer"
+                    className="w-full mt-2 bg-gradient-to-r from-brand-muted to-brand-light hover:opacity-90 text-brand-dark font-semibold py-3 px-4 rounded-xl flex items-center justify-center gap-2 transform transition-all hover:scale-[1.02] active:scale-[0.98] shadow-[0_0_20px_rgba(76,195,255,0.3)] signup-element disabled:opacity-70 disabled:cursor-not-allowed cursor-pointer"
                 >
                     <UserPlus className="h-5 w-5" />
                     {isLoading ? 'Creating Account...' : 'Create Account'}

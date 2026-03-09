@@ -15,7 +15,7 @@ const Home = () => {
     return (
         <div ref={containerRef} className="w-full h-full flex flex-col items-center justify-center p-8">
             <div className="max-w-4xl w-full mx-auto text-center space-y-8">
-                <div className="home-element mx-auto w-24 h-24 mb-6 rounded-full bg-gradient-to-br from-brand-pale to-brand-light flex items-center justify-center shadow-[0_0_30px_rgba(236,239,202,0.4)]">
+                <div className="home-element mx-auto w-24 h-24 mb-6 rounded-full bg-gradient-to-br from-brand-pale to-brand-light flex items-center justify-center shadow-[0_0_30px_rgba(255,141,242,0.4)]">
                     <span className="text-4xl font-bold text-brand-dark">🚀</span>
                 </div>
 
